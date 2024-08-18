@@ -8,7 +8,6 @@ import com.rivelbop.rivelworks.io.Assets;
 
 public class Main extends Game {
     public static final int HEIGHT = 480, WIDTH = HEIGHT * 16 / 9;
-    public static final float PPM = 100f;
     public Assets assets;
 
     @Override
@@ -26,7 +25,7 @@ public class Main extends Game {
 
     @Override
     public void dispose() {
-        this.setScreen(null); // Hides and disposes the current screen
+        super.dispose();
         assets.dispose();
         RivelWorks.dispose();
     }
