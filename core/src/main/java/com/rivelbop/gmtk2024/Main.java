@@ -15,6 +15,7 @@ public class Main extends Game {
         // TODO: Change logging upon release
         RivelWorks.init(Log.LEVEL_DEBUG, null, true, false);
         assets = new Assets();
+
         this.setScreen(new LoadingScene());
     }
 

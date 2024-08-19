@@ -1,8 +1,8 @@
 package com.rivelbop.gmtk2024.scene;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -15,7 +15,9 @@ import com.rivelbop.rivelworks.util.Utils;
 public class MenuScene extends Scene {
     private OrthographicCamera camera;
     private ScreenViewport viewport;
-    private SpriteBatch batch;
+    private SpriteBatch spriteBatch;
+
+    private Texture logo;
 
     private Skin skin;
     private Stage stage;
@@ -27,12 +29,13 @@ public class MenuScene extends Scene {
         viewport = new ScreenViewport(camera);
         camera.update();
 
-        batch = new SpriteBatch();
+        spriteBatch = new SpriteBatch();
+        logo = new Texture("rivelbop.png");
         skin = new Skin(Gdx.files.internal("skin/comic-ui.json"));
-        stage = new Stage(viewport, batch);
+        stage = new Stage(viewport, spriteBatch);
 
         verticalGroup = new VerticalGroup();
-        verticalGroup.space(10f);
+        verticalGroup.space(50f);
         verticalGroup.center();
         verticalGroup.addActor(
             new TextButton("Play", skin) {{
@@ -66,12 +69,14 @@ public class MenuScene extends Scene {
         Utils.clearScreen2D();
 
         stage.act(delta);
-
         camera.update();
         viewport.apply(true);
 
+        spriteBatch.setProjectionMatrix(camera.combined);
+        spriteBatch.begin();
+        spriteBatch.draw(logo, 10f, 10f, 64f, 64f);
+        spriteBatch.end();
         stage.draw();
-        MAIN.setScreen(new GameScene());
     }
 
     @Override
@@ -82,8 +87,10 @@ public class MenuScene extends Scene {
 
     @Override
     public void dispose() {
-        batch.dispose();
+        logo.dispose();
         skin.dispose();
         stage.dispose();
+        spriteBatch.dispose();
+        Gdx.input.setInputProcessor(null);
     }
 }

@@ -1,5 +1,6 @@
 package com.rivelbop.gmtk2024;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
@@ -33,15 +34,40 @@ public class Physics {
 
             assert collidingBody != null;
             if (collidingBody.getUserData() instanceof Physics.BodyData) {
-                PLAYER.hittingBody = collidingBody;
+                BodyData bodyData = (BodyData) collidingBody.getUserData();
+
+                if (bodyData.isEnemy) {
+                    PLAYER.physicsBody.applyForceToCenter(bodyData.push, true);
+                    PLAYER.isFlung = true;
+                } else {
+                    PLAYER.hittingBody = collidingBody;
+                }
             }
         }
 
         @Override
         public void endContact(Contact contact) {
-            if (contact.getFixtureA().getBody() == PLAYER.hittingBody ||
-            contact.getFixtureB().getBody() == PLAYER.hittingBody) {
+            boolean isFixtureA = contact.getFixtureA().getBody() == PLAYER.physicsBody;
+            boolean isFixtureB = contact.getFixtureB().getBody() == PLAYER.physicsBody;
+            if (!isFixtureA && !isFixtureB) {
+                return;
+            }
+
+            Body collidingBody =
+                (!isFixtureA) ? contact.getFixtureA().getBody() :
+                    (!isFixtureB) ? contact.getFixtureB().getBody() : null;
+
+            if (collidingBody == PLAYER.hittingBody) {
                 PLAYER.hittingBody = null;
+                return;
+            }
+
+            assert collidingBody != null;
+            if (collidingBody.getUserData() instanceof BodyData) {
+                BodyData bodyData = (BodyData) collidingBody.getUserData();
+                if (bodyData.isEnemy) {
+                    PLAYER.isFlung = true;
+                }
             }
         }
 
@@ -58,6 +84,11 @@ public class Physics {
         private final Body BODY;
         public final Sprite SPRITE;
 
+        public boolean isEnemy;
+        public Vector2 push;
+        private float movementTimer;
+        private byte direction = 1;
+
         public BodyData(Body body, Sprite sprite) {
             this.BODY = body;
             this.SPRITE = sprite;
@@ -69,6 +100,15 @@ public class Physics {
             SPRITE.setPosition(position.x, position.y);
             SPRITE.setOriginCenter();
             SPRITE.setRotation(MathUtils.radiansToDegrees * BODY.getAngle());
+
+            if (isEnemy) {
+                movementTimer += Gdx.graphics.getDeltaTime();
+                if (movementTimer >= 0.5f) {
+                    direction *= -1;
+                    movementTimer = 0f;
+                }
+                BODY.setLinearVelocity(direction, BODY.getLinearVelocity().y);
+            }
         }
 
         public void render(SpriteBatch batch) {
