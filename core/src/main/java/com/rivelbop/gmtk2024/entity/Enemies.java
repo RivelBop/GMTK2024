@@ -6,7 +6,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.rivelbop.rivelworks.io.Assets;
 
 public enum Enemies {
-    GOAT("goat.png", -25f, 75f, 57.4f, 53.4f);
+    GOAT("goat.png", -1250f, 250f, 114.8f, 106.8f);
 
     private final String TEXTURE_NAME;
     private final Vector2 PUSH, DIMENSIONS;

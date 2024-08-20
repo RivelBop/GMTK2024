@@ -36,10 +36,12 @@ public class Physics {
             if (collidingBody.getUserData() instanceof Physics.BodyData) {
                 BodyData bodyData = (BodyData) collidingBody.getUserData();
 
-                if (bodyData.isEnemy) {
+                if (bodyData.canKill) {
+                    PLAYER.isKilled = true;
+                } else if (bodyData.isEnemy) {
                     PLAYER.physicsBody.applyForceToCenter(bodyData.push, true);
                     PLAYER.isFlung = true;
-                } else {
+                } else if (bodyData.canToss) {
                     PLAYER.hittingBody = collidingBody;
                 }
             }
@@ -81,15 +83,37 @@ public class Physics {
     }
 
     public static class BodyData {
+        private final Player PLAYER;
         private final Body BODY;
         public final Sprite SPRITE;
 
-        public boolean isEnemy;
+        public boolean canToss, canKill, isEnemy;
         public Vector2 push;
         private float movementTimer;
         private byte direction = 1;
 
+        private RayCastCallback rayCastCallback = new RayCastCallback() {
+            @Override
+            public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
+                assert PLAYER != null;
+                if (fixture.getBody() == PLAYER.physicsBody) {
+                    BODY.setType(BodyDef.BodyType.DynamicBody);
+                    return 0;
+                }
+                return 1;
+            }
+        };
+
+        public String tag = "";
+
         public BodyData(Body body, Sprite sprite) {
+            this.PLAYER = null;
+            this.BODY = body;
+            this.SPRITE = sprite;
+        }
+
+        public BodyData(Body body, Sprite sprite, Player player) {
+            this.PLAYER = player;
             this.BODY = body;
             this.SPRITE = sprite;
         }
@@ -103,11 +127,15 @@ public class Physics {
 
             if (isEnemy) {
                 movementTimer += Gdx.graphics.getDeltaTime();
-                if (movementTimer >= 0.5f) {
+                if (movementTimer >= 1.5f) {
                     direction *= -1;
                     movementTimer = 0f;
                 }
-                BODY.setLinearVelocity(direction, BODY.getLinearVelocity().y);
+                BODY.setLinearVelocity(direction * 3f, BODY.getLinearVelocity().y);
+            }
+
+            if (PLAYER != null) {
+                BODY.getWorld().rayCast(rayCastCallback, BODY.getPosition(), BODY.getPosition().cpy().sub(0f, 100f));
             }
         }
 

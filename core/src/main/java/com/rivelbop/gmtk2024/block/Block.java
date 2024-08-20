@@ -11,7 +11,7 @@ import com.rivelbop.rivelworks.g2d.physics.body.DynamicBody2D;
 
 public class Block {
     private static final float
-        WIDTH = 64f, HEIGHT = 64f,
+        WIDTH = 160f, HEIGHT = 160f,
         PHYS_WIDTH = WIDTH / 2f / Physics.PPM, PHYS_HEIGHT = HEIGHT / 2f / Physics.PPM;
     public Body physicsBody;
 
@@ -33,6 +33,7 @@ public class Block {
         Sprite sprite = new Sprite(texture);
         sprite.setSize(WIDTH, HEIGHT);
         Physics.BodyData bodyData = new Physics.BodyData(physicsBody, sprite);
+        bodyData.canToss = true;
         bodyData.update();
         physicsBody.setUserData(bodyData);
     }

@@ -3,8 +3,10 @@ package com.rivelbop.gmtk2024.scene;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.rivelbop.gmtk2024.block.Blocks;
@@ -41,6 +43,10 @@ public class LoadingScene extends Scene {
         backgroundBar = new Rectangle(0f, 0f, 0f, HEIGHT);
         bar = new Rectangle(0f, 0f, 0f, HEIGHT);
 
+        MAIN.assets.load("bg_grass.png", Texture.class);
+        MAIN.assets.load("bg_sky.png", Texture.class);
+        MAIN.assets.load("bg_space.png", Texture.class);
+        MAIN.assets.load("spike.png", Texture.class);
         Blocks.loadTexturesToAssets(MAIN.assets);
         Enemies.loadTexturesToAssets(MAIN.assets);
     }

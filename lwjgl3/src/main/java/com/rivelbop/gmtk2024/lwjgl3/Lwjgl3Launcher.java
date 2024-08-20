@@ -19,6 +19,7 @@ public class Lwjgl3Launcher {
         // TODO: Disable audio for TuningFork
         Lwjgl3ApplicationConfiguration configuration = new Lwjgl3ApplicationConfiguration();
         configuration.setTitle("GMTK2024");
+        configuration.disableAudio(true);
         configuration.useVsync(true);
         configuration.setForegroundFPS(Lwjgl3ApplicationConfiguration.getDisplayMode().refreshRate + 1);
         configuration.setWindowedMode(Main.WIDTH, Main.HEIGHT);
