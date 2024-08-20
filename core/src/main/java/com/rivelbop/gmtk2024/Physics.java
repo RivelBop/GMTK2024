@@ -92,15 +92,14 @@ public class Physics {
         private float movementTimer;
         private byte direction = 1;
 
-        private RayCastCallback rayCastCallback = new RayCastCallback() {
+        private final RayCastCallback rayCastCallback = new RayCastCallback() {
             @Override
             public float reportRayFixture(Fixture fixture, Vector2 point, Vector2 normal, float fraction) {
                 assert PLAYER != null;
                 if (fixture.getBody() == PLAYER.physicsBody) {
                     BODY.setType(BodyDef.BodyType.DynamicBody);
-                    return 0;
                 }
-                return 1;
+                return 0;
             }
         };
 

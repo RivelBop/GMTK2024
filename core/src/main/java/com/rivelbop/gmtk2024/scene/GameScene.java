@@ -2,8 +2,6 @@ package com.rivelbop.gmtk2024.scene;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.backends.lwjgl3.audio.Ogg;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -25,7 +23,6 @@ import com.rivelbop.gmtk2024.block.Spike;
 import com.rivelbop.gmtk2024.block.Wind;
 import com.rivelbop.gmtk2024.entity.Enemies;
 import com.rivelbop.gmtk2024.entity.Player;
-import com.rivelbop.rivelworks.RivelWorks;
 import com.rivelbop.rivelworks.g2d.graphics.ShapeBatch;
 import com.rivelbop.rivelworks.g2d.map.OrthogonalMap;
 import com.rivelbop.rivelworks.ui.Font;
@@ -35,12 +32,14 @@ import de.pottgames.tuningfork.SoundLoader;
 import de.pottgames.tuningfork.StreamedSoundSource;
 
 public class GameScene extends Scene {
-    private static final float BACKGROUND_LERP = 1/20f;
+    private static final float BACKGROUND_LERP = 1 / 20f;
+
     private enum Background {
         GRASS,
         SKY,
-        SPACE;
+        SPACE
     }
+
     private Array<Rectangle> grass, sky, space;
     private Sprite bg_grass, bg_sky, bg_space;
     private Background currentBackground = Background.GRASS;
@@ -56,13 +55,13 @@ public class GameScene extends Scene {
     private Array<Wind> winds;
     private Player player;
 
-    private Array<SoundBuffer> sounds = new Array<>();
+    private final Array<SoundBuffer> sounds = new Array<>();
     private boolean hasFallen;
     private float timer;
 
-    // DEBUGGING
-    private Box2DDebugRenderer physicsRenderer;
-    private ShapeBatch shapeBatch;
+    private Rectangle win;
+    private float winDuration, winTimer;
+    private boolean hasWon;
 
     private StreamedSoundSource music, ambient;
 
@@ -81,8 +80,6 @@ public class GameScene extends Scene {
         camera.zoom = 1.5f;
         camera.update();
         spriteBatch = new SpriteBatch();
-        physicsRenderer = new Box2DDebugRenderer();
-        shapeBatch = new ShapeBatch();
 
         bg_grass = new Sprite(MAIN.assets.get("bg_grass.png", Texture.class));
         bg_sky = new Sprite(MAIN.assets.get("bg_sky.png", Texture.class));
@@ -121,6 +118,7 @@ public class GameScene extends Scene {
         for (int i = 0; i < 19; i++) {
             sounds.add(SoundLoader.load(Gdx.files.internal("audio_" + i + ".ogg")));
         }
+        sounds.add(SoundLoader.load(Gdx.files.internal("win.ogg")));
         sounds.get(0).play();
 
         Font.FontBuilder builder = new Font.FontBuilder();
@@ -129,6 +127,8 @@ public class GameScene extends Scene {
             setSize(64).
             build();
         builder.dispose();
+
+        win = map.getBoundingShapes(Rectangle.class, "david").get(0);
     }
 
     @Override
@@ -138,6 +138,21 @@ public class GameScene extends Scene {
         player.update();
         for (Wind w : winds) {
             player.applyWind(w);
+        }
+
+        if (player.sprite.getBoundingRectangle().overlaps(win)) {
+            if (!hasWon) {
+                winDuration = sounds.get(sounds.size - 1).getDuration();
+                sounds.get(sounds.size - 1).play();
+                hasWon = true;
+            }
+        }
+
+        if (hasWon) {
+            winTimer += delta;
+            if (winTimer >= winDuration) {
+                Enemies.GOAT.create(physicsWorld, player.sprite.getX(), player.sprite.getY());
+            }
         }
 
         // Update physics
@@ -213,16 +228,16 @@ public class GameScene extends Scene {
 
         map.render(camera);
 
-        timer += delta;
+        if (!hasWon) {
+            timer += delta;
+        }
         spriteBatch.setProjectionMatrix(camera.projection);
         spriteBatch.begin();
-        String timerStr = String.valueOf(timer);
         font.getBitmapFont().setColor(Color.YELLOW);
-        font.drawCenter(spriteBatch, timerStr.substring(0, timerStr.indexOf('.') + 3), 0f, Main.HEIGHT / 2f + 50f);
+        font.drawCenter(spriteBatch, String.valueOf((int) timer), 0f, Main.HEIGHT / 2f + 50f);
         spriteBatch.end();
 
         camera.combined.scl(Physics.PPM);
-        physicsRenderer.render(physicsWorld, camera.combined);
 
         if (player.physicsBody.getLinearVelocity().y > -5f) {
             hasFallen = false;
@@ -259,7 +274,6 @@ public class GameScene extends Scene {
 
         font.dispose();
         spriteBatch.dispose();
-        physicsRenderer.dispose();
 
         physicsWorld.dispose();
     }

@@ -1,6 +1,5 @@
 package com.rivelbop.gmtk2024.entity;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Vector2;
@@ -13,7 +12,7 @@ import com.rivelbop.rivelworks.g2d.physics.body.DynamicBody2D;
 public class Enemy {
     private final float
         WIDTH, HEIGHT, PHYS_WIDTH, PHYS_HEIGHT;
-    private Body physicsBody;
+    private final Body physicsBody;
 
     public Enemy() {
         physicsBody = null;
@@ -31,7 +30,9 @@ public class Enemy {
 
         physicsBody = new DynamicBody2D(
             world,
-            new PolygonShape() {{setAsBox(PHYS_WIDTH, PHYS_HEIGHT);}},
+            new PolygonShape() {{
+                setAsBox(PHYS_WIDTH, PHYS_HEIGHT);
+            }},
             1f,
             1f,
             0f

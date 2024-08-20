@@ -21,7 +21,9 @@ public class Spike {
     public Spike(World world, Assets assets, Vector2 position, Player player) {
         physicsBody = new DynamicBody2D(
             world,
-            new PolygonShape() {{setAsBox(PHYS_WIDTH, PHYS_HEIGHT);}},
+            new PolygonShape() {{
+                setAsBox(PHYS_WIDTH, PHYS_HEIGHT);
+            }},
             5f,
             1f,
             0f

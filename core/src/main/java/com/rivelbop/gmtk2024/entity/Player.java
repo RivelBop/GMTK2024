@@ -3,8 +3,6 @@ package com.rivelbop.gmtk2024.entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.ParticleEffect;
-import com.badlogic.gdx.graphics.g2d.ParticleEmitter;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -28,8 +26,6 @@ public class Player {
     protected boolean onGround;
     public boolean isFlung, isKilled;
     public SoundBuffer jumpSound;
-    private ParticleEffect walkPar, jumpPar;
-
     private final RayCastCallback RAY_CALLBACK =
         (fixture, point, normal, fraction) -> {
             standingBody = fixture.getBody();
@@ -41,10 +37,7 @@ public class Player {
         sprite = new Sprite(assets.get("goat.png", Texture.class));
         sprite.setSize(sprite.getWidth() * 0.2f, sprite.getHeight() * 0.2f);
 
-        jumpSound = SoundLoader.load(Gdx.files.internal("mixkit-arrow-whoosh-1491_1.ogg"));
-
-        //walkPar = new ParticleE
-        //jumpPar = new ParticleEmitter();
+        jumpSound = SoundLoader.load(Gdx.files.internal("jump.ogg"));
 
         // Physics body
         CircleShape shape = new CircleShape();
@@ -52,6 +45,21 @@ public class Player {
         physicsBody = new DynamicBody2D(world, shape, 1f, 10f, 0f).getBody();
         physicsBody.setSleepingAllowed(false);
         physicsBody.setTransform(Main.WIDTH / 2f / Physics.PPM, Main.HEIGHT / 2f / Physics.PPM, 0f);
+        physicsBody.setUserData(new Physics.BodyData(physicsBody, sprite));
+
+        PHYSICS_WORLD = world;
+    }
+
+    public Player(Assets assets, World world, Vector2 position) {
+        sprite = new Sprite(assets.get("goat.png", Texture.class));
+        sprite.setSize(sprite.getWidth() * 0.1f, sprite.getHeight() * 0.1f);
+
+        // Physics body
+        CircleShape shape = new CircleShape();
+        shape.setRadius(RADIUS / 2f);
+        physicsBody = new DynamicBody2D(world, shape, 1f, 10f, 0f).getBody();
+        physicsBody.setSleepingAllowed(false);
+        physicsBody.setTransform(position.x / Physics.PPM, position.y / Physics.PPM, 0f);
         physicsBody.setUserData(new Physics.BodyData(physicsBody, sprite));
 
         PHYSICS_WORLD = world;
@@ -93,12 +101,16 @@ public class Player {
     private void moveBody() {
         if (hittingBody != null) {
             Vector2 velocity = hittingBody.getLinearVelocity();
-            if (onGround && standingBody != hittingBody && Gdx.input.isKeyPressed(Input.Keys.W)) {
-                boolean left = Gdx.input.isKeyPressed(Input.Keys.A);
-                boolean right = Gdx.input.isKeyPressed(Input.Keys.D);
+            boolean left = Gdx.input.isKeyPressed(Input.Keys.A);
+            boolean right = Gdx.input.isKeyPressed(Input.Keys.D);
 
+            if (onGround && standingBody != hittingBody && Gdx.input.isKeyPressed(Input.Keys.W)) {
                 velocity.x = ((left && right) || (!left && !right)) ? 0f : (left) ? -3f : 3f;
                 velocity.y = 3f;
+            } else if (onGround && standingBody != hittingBody && left) {
+                velocity.x = -1.5f;
+            } else if (onGround && standingBody != hittingBody && right) {
+                velocity.x = 1.5f;
             }
             hittingBody.setLinearVelocity(velocity);
         }

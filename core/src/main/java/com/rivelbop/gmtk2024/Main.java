@@ -1,6 +1,7 @@
 package com.rivelbop.gmtk2024;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.esotericsoftware.minlog.Log;
 import com.rivelbop.gmtk2024.scene.LoadingScene;
 import com.rivelbop.rivelworks.RivelWorks;
@@ -13,9 +14,9 @@ public class Main extends Game {
     @Override
     public void create() {
         // TODO: Change logging upon release
+        Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
         RivelWorks.init(Log.LEVEL_DEBUG, null, true, false);
         assets = new Assets();
-
         this.setScreen(new LoadingScene());
     }
 

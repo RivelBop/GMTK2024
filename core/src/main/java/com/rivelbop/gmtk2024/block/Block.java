@@ -22,7 +22,9 @@ public class Block {
     public Block(World world, Texture texture, Vector2 position) {
         physicsBody = new DynamicBody2D(
             world,
-            new PolygonShape() {{setAsBox(PHYS_WIDTH, PHYS_HEIGHT);}},
+            new PolygonShape() {{
+                setAsBox(PHYS_WIDTH, PHYS_HEIGHT);
+            }},
             1f,
             1f,
             0f
