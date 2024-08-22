@@ -26,7 +26,7 @@ public class Block {
                 setAsBox(PHYS_WIDTH, PHYS_HEIGHT);
             }},
             1f,
-            1f,
+            2f,
             0f
         ).getBody();
         physicsBody.setFixedRotation(true);

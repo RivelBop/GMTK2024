@@ -107,10 +107,14 @@ public class Player {
             if (onGround && standingBody != hittingBody && Gdx.input.isKeyPressed(Input.Keys.W)) {
                 velocity.x = ((left && right) || (!left && !right)) ? 0f : (left) ? -3f : 3f;
                 velocity.y = 3f;
-            } else if (onGround && standingBody != hittingBody && left) {
-                velocity.x = -1.5f;
-            } else if (onGround && standingBody != hittingBody && right) {
-                velocity.x = 1.5f;
+            }
+
+            if (standingBody != hittingBody) {
+                if (left) {
+                    velocity.x = -1.5f;
+                } else if (right) {
+                    velocity.x = 1.5f;
+                }
             }
             hittingBody.setLinearVelocity(velocity);
         }
